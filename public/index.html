@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Question Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #ff7e5f, #feb47b);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    #start-btn,
+    #submit-btn {
+      background-color: #ff6347;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 0;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    #start-btn:hover,
+    #submit-btn:hover {
+      background-color: #ff4500;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      font-size: 16px;
+      margin: 20px 0;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 id="question">GET A RANDOM QUESTION</h1>
+    <button id="start-btn">GET</button><br>
+    <input type="text" id="question-input" placeholder="Type your question here:" disabled><br>
+    <button id="submit-btn" disabled>SUBMIT</button>
+  </div>
+  <script src="./env.js"></script>
+  <script>
+    const startBtn = document.getElementById('start-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const questionInput = document.getElementById('question-input');
+    const questionOutput = document.getElementById('question');
+    const API_URL = "http://localhost:3000";
+
+    startBtn.addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${API_URL}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+
+        questionOutput.innerText = data['question'];
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      try {
+        const response = await fetch(`${API_URL}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            question: questionInput.value,
+            date: new Date(),
+            user: "dummy",
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log('POST Response:', data);
+
+      } catch (error) {
+        console.error('Error posting data:', error);
+      }
+    });
+  </script>
+</body>
+
+</html>
