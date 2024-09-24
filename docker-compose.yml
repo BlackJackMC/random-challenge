@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    ports:
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - API_KEY=${API_KEY}
+      - PORT=${PORT}
