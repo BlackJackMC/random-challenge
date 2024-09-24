@@ -64,10 +64,9 @@
   <div class="container">
     <h1 id="question">GET A RANDOM QUESTION</h1>
     <button id="start-btn">GET</button><br>
-    <input type="text" id="question-input" placeholder="Type your question here:" disabled><br>
-    <button id="submit-btn" disabled>SUBMIT</button>
+    <input type="text" id="question-input" placeholder="Type your question here:"><br>
+    <button id="submit-btn">SUBMIT</button>
   </div>
-  <script src="./env.js"></script>
   <script>
     const startBtn = document.getElementById('start-btn');
     const submitBtn = document.getElementById('submit-btn');
@@ -76,6 +75,7 @@
     const API_URL = "http://localhost:3000";
 
     startBtn.addEventListener('click', async () => {
+      startBtn.disabled = true;
       try {
         const response = await fetch(`${API_URL}`, {
           method: 'GET',
@@ -84,18 +84,24 @@
           }
         });
 
-        if (!response.ok) {
+        if (response.status === 404) {
+          questionOutput.innerText = 'There is no question on database';
+        } else if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
+        } else {
+          const data = await response.json();
+          questionOutput.innerText = data['question'];
         }
-        const data = await response.json();
-
-        questionOutput.innerText = data['question'];
       } catch (error) {
         console.error('Error fetching data:', error);
+        questionOutput.innerText = 'An error occurred while fetching the question.';
+      } finally {
+        startBtn.disabled = false;
       }
     });
 
     submitBtn.addEventListener('click', async () => {
+      submitBtn.disabled = true;
       try {
         const response = await fetch(`${API_URL}/`, {
           method: 'POST',
@@ -115,12 +121,15 @@
 
         const data = await response.json();
         console.log('POST Response:', data);
-
+        questionInput.value = '';
       } catch (error) {
         console.error('Error posting data:', error);
+      } finally {
+        submitBtn.disabled = false;
       }
     });
   </script>
+
 </body>
 
 </html>
